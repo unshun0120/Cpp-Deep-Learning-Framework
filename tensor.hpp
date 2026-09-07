@@ -1,6 +1,6 @@
 #include <cstddef>
 #include<vector>
-
+           
 class Tensor {
 private:
     std::vector<float> data_;
