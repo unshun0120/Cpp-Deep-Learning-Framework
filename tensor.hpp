@@ -27,7 +27,8 @@ public:
     void set(size_t row, size_t col, float value);
     
     void reshape(const std::vector<size_t>& new_shape);
-
+    
+    Tensor add(const Tensor& other) const;
 };
 
 

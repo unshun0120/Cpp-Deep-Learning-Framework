@@ -79,6 +79,20 @@ void Tensor::reshape(const vector<size_t>& new_shape) {
     this->shape_ = new_shape;
 }
 
+// add
+Tensor Tensor::add(const Tensor& other) const {
+    
+    assert(this->shape_ == other.shape());
+
+    Tensor result(this->shape_);
+
+    for(size_t i = 0; i < this->numel(); i++) {
+        result.set(i, this->at(i) + other.at(i));
+    }
+
+    return result;
+}
+
 
 
 

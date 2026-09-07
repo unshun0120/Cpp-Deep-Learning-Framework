@@ -1,29 +1,35 @@
-#include <cassert>
+#include<cassert>
+#include<iostream>
 
 #include "tensor.hpp"
 
-int main() {
-    Tensor t({2, 3});
+using namespace std;
 
-    for(size_t i = 0; i < t.numel(); i++) {
-        t.set(i, static_cast<float>(i));
+int main() {    
+    Tensor a({2, 3});
+    Tensor b({2, 3});
+
+    for(size_t i = 0; i < 6; i++) {
+        a.set(i, i+1);
+        b.set(i, 10+i*10);
+    }
+
+    for(size_t i = 0; i < 6; i++){
+        cout << "a" << a.at(i) << endl;
+        cout << "b" << b.at(i) << endl;
     }
     
-    t.reshape({3, 2});
+    Tensor c = a.add(b);
 
-    assert(t.shape()[0] == 3);
-    assert(t.shape()[1] == 2);  
+    assert(c.numel() == 6);
+    assert(c.shape() == a.shape());
 
-    assert(t.numel() == 6);
+    assert(c.at(0) == 11.0f);
+    assert(c.at(1) == 22.0f);
+    assert(c.at(5) == 66.0f);
 
-    assert(t.at(0) == 0.0f);
-    assert(t.at(1) == 1.0f);
-    assert(t.at(2) == 2.0f);
-    assert(t.at(3) == 3.0f);
-    assert(t.at(4) == 4.0f);
-    assert(t.at(5) == 5.0f);
-    
-    t.reshape({2, 4});
+    assert(a.at(0) == 1.0f);
+    assert(b.at(0) == 10.0f); 
 
     return 0;
 }
