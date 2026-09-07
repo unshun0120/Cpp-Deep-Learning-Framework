@@ -1,5 +1,6 @@
-#include <cstddef>
+#include<cstddef>
 #include<vector>
+#include<cassert>
 
 #include "tensor.hpp"
 
@@ -49,6 +50,52 @@ float Tensor::at(size_t index) const {
 void Tensor::set(size_t index, float value) {
     this->data_.at(index) = value;
 }
+
+// at (2D)
+float Tensor::at(size_t row, size_t col) const {  
+    assert(shape_.size() == 2);
+    assert(row < shape_[0]);
+    assert(col < shape_[1]);
+
+    return this->data_.at(row * shape_[1] + col);
+}
+
+// set (2D)
+void Tensor::set(size_t row, size_t col, float value) {
+    assert(shape_.size() == 2);
+    assert(row < shape_[0]);
+    assert(col < shape_[1]);
+
+    this->data_.at(row * shape_[1] + col) = value;
+}
+
+// reshape
+void Tensor::reshape(const vector<size_t>& new_shape) {
+    size_t num_elements = 1;
+    for(auto const& dim : new_shape) {
+        num_elements *= dim;
+    }
+    assert(num_elements == this->numel());
+    this->shape_ = new_shape;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
