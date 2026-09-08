@@ -40,8 +40,8 @@ Tensor linear(const Tensor& input, const Tensor& weight, const Tensor& bias) {
     return output;
 }
 
-
 // MSE Loss
+// Sigma[(pred - target)^2] / N 
 float mse_loss(const Tensor& prediction, const Tensor& target) {
     assert(prediction.shape() == target.shape());
     
@@ -55,6 +55,39 @@ float mse_loss(const Tensor& prediction, const Tensor& target) {
         
     return loss;
 }
+
+// MSE loss backward gradient
+// 對MSE的predict微分, Sigma[(pred - target)^2] / N -> 2*(pred-target) / N
+Tensor mse_loss_backward(const Tensor& prediction, const Tensor& target) {
+    assert(prediction.shape() == target.shape());
+    
+    Tensor gradient(prediction.shape());
+
+    for(size_t i = 0; i < prediction.numel(); i++) {
+        gradient.set(i, 2.0f * (prediction.at(i) - target.at(i)) / prediction.numel());
+    }
+    
+    return gradient;
+}
+
+// 微分/gradient的意義: 某個變數改變時對loss的影響程度, loss會改變多少
+// 為什麼training需要gradient: 模型要更新weight和bias, 就必須知道參數往哪個方向改會讓loss下降, optimizer才能正確更新參數
+Tensor relu_backward(const Tensor& input, const Tensor& grad_output) {
+    assert(input.shape() == grad_output.shape());
+    
+    Tensor grad_input(grad_output.shape());
+
+    for(size_t i = 0; i < input.numel(); i++) { 
+        if(input.at(i) > 0)
+            grad_input.set(i, grad_output.at(i));
+        else
+            grad_input.set(i, 0.0f);
+    }
+    
+    return grad_input;
+}
+
+
 
 
 
