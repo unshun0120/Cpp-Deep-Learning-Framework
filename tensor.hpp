@@ -1,4 +1,6 @@
-#include <cstddef>
+#pragma once
+
+#include<cstddef>
 #include<vector>
            
 class Tensor {
@@ -29,6 +31,10 @@ public:
     void reshape(const std::vector<size_t>& new_shape);
     
     Tensor add(const Tensor& other) const;
+
+    Tensor multiply(const Tensor& other) const;
+
+    Tensor matmul(const Tensor& other) const;
 };
 
 

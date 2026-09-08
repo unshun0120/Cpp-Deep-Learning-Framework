@@ -1,35 +1,23 @@
-#include<cassert>
-#include<iostream>
+#include <cassert>
 
 #include "tensor.hpp"
 
-using namespace std;
+int main() {
+    Tensor a({1, 2});
+    Tensor b({2, 1});
 
-int main() {    
-    Tensor a({2, 3});
-    Tensor b({2, 3});
+    a.set(0, 0, 0.5f);
+    a.set(0, 1, 1.0f);
 
-    for(size_t i = 0; i < 6; i++) {
-        a.set(i, i+1);
-        b.set(i, 10+i*10);
-    }
+    b.set(0, 0, 2.0f);
+    b.set(1, 0, 0.5f);
 
-    for(size_t i = 0; i < 6; i++){
-        cout << "a" << a.at(i) << endl;
-        cout << "b" << b.at(i) << endl;
-    }
-    
-    Tensor c = a.add(b);
+    Tensor c = a.matmul(b);
 
-    assert(c.numel() == 6);
-    assert(c.shape() == a.shape());
+    assert(c.shape()[0] == 1);
+    assert(c.shape()[1] == 1);
 
-    assert(c.at(0) == 11.0f);
-    assert(c.at(1) == 22.0f);
-    assert(c.at(5) == 66.0f);
-
-    assert(a.at(0) == 1.0f);
-    assert(b.at(0) == 10.0f); 
+    assert(c.at(0, 0) == 1.5f);
 
     return 0;
 }

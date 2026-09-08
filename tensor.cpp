@@ -88,12 +88,42 @@ Tensor Tensor::add(const Tensor& other) const {
 
     for(size_t i = 0; i < this->numel(); i++) {
         result.set(i, this->at(i) + other.at(i));
-    }
+    }  
 
     return result;
 }
 
+Tensor Tensor::multiply(const Tensor& other) const {
+    assert(this->shape_ == other.shape());
 
+    Tensor result(this->shape_);
+
+    for(size_t i = 0; i < this->numel(); i++) {
+        result.set(i, this->at(i) * other.at(i));
+    }  
+
+    return result;
+}
+
+Tensor Tensor::matmul(const Tensor& other) const {
+    assert(this->shape_.size() == 2);
+    assert(other.shape_.size() == 2);
+    assert(this->shape_[1] == other.shape_[0]);
+
+    Tensor result({this->shape_[0], other.shape_[1]});   
+
+    for(size_t i = 0; i < this->shape_[0]; i++) {
+        for(size_t j = 0; j < other.shape_[1]; j++) {
+            float sum = 0;
+            for(size_t k = 0; k < this->shape_[1]; k++) {
+                sum += this->at(i, k) * other.at(k, j);  
+            }
+            result.set(i, j, sum);
+        }
+    }
+    
+    return result;
+}
 
 
 
