@@ -12,6 +12,8 @@ Tensor mse_loss_backward(const Tensor& prediction, const Tensor& target);
 
 Tensor relu_backward(const Tensor& input, const Tensor& grad_output);
 
+Tensor linear_backward_input(const Tensor& grad_output, const Tensor& weight);
+
 
 
 

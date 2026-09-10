@@ -56,5 +56,33 @@ int main() {
     assert(grad_input.at(4) == -5.0f);
     assert(grad_input.at(5) == 0.0f);
 
+
+    Tensor weight({2, 3});
+    Tensor grad_output_2({2, 3});
+
+    weight.set(0, 0, 1.0f);
+    weight.set(0, 1, 2.0f);
+    weight.set(0, 2, 3.0f);
+    weight.set(1, 0, 4.0f);
+    weight.set(1, 1, 5.0f);
+    weight.set(1, 2, 6.0f);
+
+    grad_output_2.set(0, 0, 1.0f);
+    grad_output_2.set(0, 1, 2.0f);
+    grad_output_2.set(0, 2, 3.0f);
+    grad_output_2.set(1, 0, 4.0f);
+    grad_output_2.set(1, 1, 5.0f);
+    grad_output_2.set(1, 2, 6.0f);
+
+    Tensor grad_input_2 = linear_backward_input(grad_output_2, weight);
+
+    assert(grad_input_2.shape()[0] == 2);
+    assert(grad_input_2.shape()[1] == 2);
+
+    assert(grad_input_2.at(0, 0) == 14.0f);
+    assert(grad_input_2.at(0, 1) == 32.0f);
+    assert(grad_input_2.at(1, 0) == 32.0f);
+    assert(grad_input_2.at(1, 1) == 77.0f);
+
     return 0;
 }
