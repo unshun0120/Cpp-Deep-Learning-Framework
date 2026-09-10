@@ -14,6 +14,9 @@ Tensor relu_backward(const Tensor& input, const Tensor& grad_output);
 
 Tensor linear_backward_input(const Tensor& grad_output, const Tensor& weight);
 
+Tensor linear_backward_weight(const Tensor& input, const Tensor& grad_output);
+
+Tensor linear_backward_bias(const Tensor& grad_output);
 
 
 
