@@ -31,6 +31,9 @@ Tensor::Tensor(const vector<size_t>& input_shape) {
         grad_elements.push_back(0.0f);
     }
     this->grad_ = grad_elements;
+
+    this->op_ = OpType::None;
+
 }
 
 // numel : return data size
@@ -89,15 +92,30 @@ void Tensor::reshape(const vector<size_t>& new_shape) {
 }
 
 // add
-Tensor Tensor::add(const Tensor& other) const {
+Tensor Tensor::add(Tensor& other) {
     
     assert(this->shape_ == other.shape());
 
     Tensor result(this->shape_);
-
+    
+    // add
     for(size_t i = 0; i < this->numel(); i++) {
         result.set(i, this->at(i) + other.at(i));
-    }  
+    }
+
+    //autograd
+    result.op_ = OpType::Add;
+
+    if(this->requires_grad() == true) {
+        result.requires_grad_ = true;
+    }
+    else if(other.requires_grad() == true) {
+        result.requires_grad_ = true;
+    }
+
+    // parent
+    result.parents_.push_back(this);
+    result.parents_.push_back(&other);
 
     return result;
 }
@@ -154,7 +172,29 @@ void Tensor::set_grad(size_t index, float value) {
     this->grad_.at(index) = value;
 }
 
+// Getter function (for test)
+OpType Tensor::op() const {
+    return this->op_;
+}
 
+size_t Tensor::num_parents() const {
+    return this->parents_.size();
+}
+
+const Tensor* Tensor::parent(size_t index) const {
+    return this->parents_.at(index);
+}
+
+// backward add
+void Tensor::backward_add() {
+    assert(this->op_ == OpType::Add);
+    
+    for(size_t i = 0; i < this->grad_.size(); i++) {
+        for(size_t j = 0; j < this->parents_.size(); j++) {
+            this->parents_.at(j)->set_grad(i, this->parents_.at(j)->grad(i) + this->grad(i));
+        }  
+    }
+}
 
 
 
