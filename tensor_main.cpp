@@ -172,6 +172,15 @@ int main() {
     assert(matmul_c.at(0, 1) == 64.0f);
     assert(matmul_c.at(1, 0) == 139.0f);
     assert(matmul_c.at(1, 1) == 154.0f);
+    
+    // autograd   
+    Tensor weight({2, 2});
+
+    weight.set_requires_grad(true);
+
+    weight.set_grad(0, 0.5f);
+    weight.set_grad(1, -1.0f);
+
 
     return 0;
 }

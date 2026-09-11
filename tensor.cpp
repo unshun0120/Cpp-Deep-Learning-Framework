@@ -22,6 +22,15 @@ Tensor::Tensor(const vector<size_t>& input_shape) {
         elements.push_back(0.0f);
     }
     this->data_ = elements;
+    // requires grad
+    this->requires_grad_ = false;
+
+    // grad
+    vector<float> grad_elements;
+    for(size_t i = 0; i < num_elements; i++){
+        grad_elements.push_back(0.0f);
+    }
+    this->grad_ = grad_elements;
 }
 
 // numel : return data size
@@ -93,6 +102,7 @@ Tensor Tensor::add(const Tensor& other) const {
     return result;
 }
 
+// multiply
 Tensor Tensor::multiply(const Tensor& other) const {
     assert(this->shape_ == other.shape());
 
@@ -105,6 +115,7 @@ Tensor Tensor::multiply(const Tensor& other) const {
     return result;
 }
 
+// 矩陣乘法
 Tensor Tensor::matmul(const Tensor& other) const {
     assert(this->shape_.size() == 2);
     assert(other.shape_.size() == 2);
@@ -125,8 +136,23 @@ Tensor Tensor::matmul(const Tensor& other) const {
     return result;
 }
 
+// requires grad
+bool Tensor::requires_grad() const {
+    return this->requires_grad_;
+}
 
+void Tensor::set_requires_grad(bool value) {
+    this->requires_grad_ = value;
+}
 
+// grad
+float Tensor::grad(size_t index) const {
+    return this->grad_.at(index);
+}
+
+void Tensor::set_grad(size_t index, float value) {
+    this->grad_.at(index) = value;
+}
 
 
 

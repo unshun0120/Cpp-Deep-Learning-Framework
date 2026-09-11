@@ -7,7 +7,9 @@ class Tensor {
 private:
     std::vector<float> data_;
     std::vector<size_t> shape_;   
-    
+    bool requires_grad_;
+    std::vector<float> grad_;
+
 public:
     // constructor
     Tensor(const std::vector<size_t>& input_shape);
@@ -35,6 +37,17 @@ public:
     Tensor multiply(const Tensor& other) const;
 
     Tensor matmul(const Tensor& other) const;
+
+    bool requires_grad() const;
+    
+    void set_requires_grad(bool value);
+
+    float grad(size_t index) const;
+    
+    void set_grad(size_t index, float value);
+
+
+
 };
 
 
