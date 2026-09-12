@@ -1,6 +1,7 @@
 #include<cstddef>
 #include<vector>
 #include<cassert>
+#include<algorithm>
 
 #include "tensor.hpp"
 
@@ -60,7 +61,7 @@ float Tensor::at(size_t index) const {
 
 // set : set value to data[idnex]
 void Tensor::set(size_t index, float value) {
-    this->data_.at(index) = value;
+this->data_.at(index) = value;
 }
 
 // at (2D)
@@ -121,7 +122,7 @@ Tensor Tensor::add(Tensor& other) {
 }
 
 // multiply
-Tensor Tensor::multiply(const Tensor& other) const {
+Tensor Tensor::multiply(Tensor& other) {
     assert(this->shape_ == other.shape());
 
     Tensor result(this->shape_);
@@ -129,6 +130,20 @@ Tensor Tensor::multiply(const Tensor& other) const {
     for(size_t i = 0; i < this->numel(); i++) {
         result.set(i, this->at(i) * other.at(i));
     }  
+
+     //autograd
+    result.op_ = OpType::Multiply;
+
+    if(this->requires_grad() == true) {
+        result.requires_grad_ = true;
+    }
+    else if(other.requires_grad() == true) {
+        result.requires_grad_ = true;
+    }
+
+    // parent
+    result.parents_.push_back(this);
+    result.parents_.push_back(&other);
 
     return result;
 }
@@ -186,6 +201,9 @@ const Tensor* Tensor::parent(size_t index) const {
 }
 
 // backward add
+// c = a + b
+// a.grad[i] += out.grad[i]
+// b.grad[i] += out.grad[i]
 void Tensor::backward_add() {
     assert(this->op_ == OpType::Add);
     
@@ -196,9 +214,63 @@ void Tensor::backward_add() {
     }
 }
 
+// backward multiply
+// c = a * b
+// a.grad[i] += out.grad[i] * b[i]
+// b.grad[i] += out.grad[i] * a[i]
+void Tensor::backward_multiply() {
+    assert(this->op_ == OpType::Multiply);
+    
+    for(size_t i = 0; i < this->grad_.size(); i++) {
+        this->parents_.at(0)->set_grad(i, 
+            this->parents_.at(0)->grad(i) + this->grad(i) * this->parents_.at(1)->data_[i]);
+        
+        this->parents_.at(1)->set_grad(i, 
+            this->parents_.at(1)->grad(i) + this->grad(i) * this->parents_.at(0)->data_[i]);       
+    }
+}
 
+// topology (DFS)
+vector<Tensor*> Tensor::build_topology() {
+    vector<Tensor*> visited;
+    vector<Tensor*> order;
 
+    this->traversal(this, visited, order);
+    
+    return order;
+}
 
+// postorder DFS, parent在前面, 當前node在最後面
+void Tensor::traversal(Tensor* node, vector<Tensor*>& visited, vector<Tensor*>& order) {
+    if(find(visited.begin(), visited.end(), node) != visited.end())
+        return;
+
+    visited.push_back(node);
+
+    for(size_t i = 0; i < node->parents_.size(); i++) {
+        node->traversal(node->parents_[i], visited, order);
+    }
+
+    order.push_back(node);
+}
+
+// backward()
+void Tensor::backward() {
+    assert(this->numel() == 1);
+    this->grad_[0] = 1;
+
+    vector<Tensor*> order = this->build_topology();
+    
+    for(int i = order.size()-1 ; i >= 0; i--) {
+        if(order[i]->op_ == OpType::Add) {
+            order[i]->backward_add();
+        }
+
+        if(order[i]->op_ == OpType::Multiply) {
+            order[i] ->backward_multiply();
+        }
+    }
+}
 
 
 

@@ -7,7 +7,8 @@
 // operation type
 enum class OpType {
     None,
-    Add
+    Add,
+    Multiply,
 };
 
 class Tensor {
@@ -20,6 +21,12 @@ private:
     
     OpType op_;
     std::vector<Tensor*> parents_;
+
+    void traversal(
+        Tensor* node,
+        std::vector<Tensor*>& visited,
+        std::vector<Tensor*>& order
+    );
 
 public:
     // constructor
@@ -47,7 +54,7 @@ public:
     // operation
     Tensor add(Tensor& other);
 
-    Tensor multiply(const Tensor& other) const;
+    Tensor multiply(Tensor& other);
 
     Tensor matmul(const Tensor& other) const;
     
@@ -61,7 +68,11 @@ public:
     void set_grad(size_t index, float value);
     
     void backward_add();
+    void backward_multiply();
 
+    std::vector<Tensor*> build_topology();
+
+    void backward();
 
     // For test
     // 單純用來測試, 拿到tensor的資訊
